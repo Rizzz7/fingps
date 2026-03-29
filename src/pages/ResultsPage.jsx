@@ -493,7 +493,7 @@ export default function ResultsPage() {
       // If no local storage (new device or corrupted), fetch from backend!
       if (!parsedData || !parsedData.rawAnswers) {
         try {
-          const res = await fetch(`${API}/api/quiz/results`, {
+          const res = await fetch(`${API}/api/quiz/latest`, {
             headers: { 'x-auth-token': token }
           });
           if (!res.ok) throw new Error("No data found in DB");
@@ -534,7 +534,7 @@ export default function ResultsPage() {
         setAnswerTimeline(getAnswerContext(parsedData.rawAnswers));
         
         try {
-           const insightsRes = await fetch(`${API}/api/chat`, {
+           const insightsRes = await fetch(`${API}/api/quiz/insights`, {
              method: 'POST',
              headers: { 
                'Content-Type': 'application/json',
