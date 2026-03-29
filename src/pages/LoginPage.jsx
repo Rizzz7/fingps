@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import API from "../lib/api";
 
 const AppInput = ({ label, placeholder, icon, type = 'text', value, onChange }) => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
@@ -50,7 +51,7 @@ const LoginPage = () => {
     setErrorMessage('')
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch(`${API}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),

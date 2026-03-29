@@ -1,4 +1,5 @@
 # FinGPS — Your Financial Life, Mapped Like GPS
+//import API from "../lib/api";//
 
 > India's first AI-powered personal finance mentor. Know where you are. Build where you're going.
 

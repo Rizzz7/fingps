@@ -7,6 +7,7 @@ import { cn } from "../lib/utils";
 import {
   ArrowUpIcon, Paperclip, Code2, Rocket, Layers, Palette, CircleUserRound, MonitorIcon, FileUp, ImageIcon
 } from "lucide-react";
+import API from "../lib/api";
 
 const PAGES = [
   { label: 'Dashboard',    path: '/dashboard' },
@@ -143,7 +144,7 @@ export default function ChatPage() {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/chat', {
+      const response = await fetch(`${API}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
         body: JSON.stringify({ message: textToSend }),

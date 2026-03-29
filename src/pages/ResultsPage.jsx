@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import API from "../lib/api";
 
 // ── PERSONA ENGINE ──
 const getPersonaProfile = (answers) => {
@@ -492,7 +493,7 @@ export default function ResultsPage() {
       // If no local storage (new device or corrupted), fetch from backend!
       if (!parsedData || !parsedData.rawAnswers) {
         try {
-          const res = await fetch('http://localhost:5000/api/quiz/latest', {
+          const res = await fetch(`${API}/api/chat`, {
             headers: { 'x-auth-token': token }
           });
           if (!res.ok) throw new Error("No data found in DB");
@@ -533,7 +534,7 @@ export default function ResultsPage() {
         setAnswerTimeline(getAnswerContext(parsedData.rawAnswers));
         
         try {
-           const insightsRes = await fetch('http://localhost:5000/api/quiz/insights', {
+           const insightsRes = await fetch(`${API}/api/chat`, {
              method: 'POST',
              headers: { 
                'Content-Type': 'application/json',

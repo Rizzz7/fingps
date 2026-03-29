@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import API from "../lib/api";
 
 const PAGES = [
   { label: 'Dashboard',    path: '/dashboard' },
@@ -219,7 +220,7 @@ const QuizPage = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/quiz/submit', {
+      const response = await fetch(`${API}/api/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

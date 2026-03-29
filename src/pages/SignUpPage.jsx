@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import API from "../lib/api";
 
 const STARS = Array.from({ length: 60 }, (_, i) => ({
   id: i, top: Math.random() * 100, left: Math.random() * 100,
@@ -56,7 +57,7 @@ const SignUpPage = () => {
     setErrorMessage('')
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
+      const response = await fetch(`${API}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: username, email, password }),

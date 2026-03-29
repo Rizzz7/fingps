@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-
+import API from "../lib/api";
 const NAV_ITEMS = [
   { icon: '✦', label: 'AI Insights', id: 'insights' },
   { icon: '🔀', label: 'What-If', id: 'whatif' },
@@ -79,7 +79,7 @@ const RoadmapPage = () => {
       }
 
       try {
-        const response = await fetch('http://localhost:5000/api/roadmap/generate', {
+        const response = await fetch(`${API}/api/chat`, {
           headers: { 'x-auth-token': token }
         })
         const data = await response.json()

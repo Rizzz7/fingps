@@ -5,6 +5,7 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Legend
 } from 'recharts'
+import API from "../lib/api";
 
 // ─────────────────────────────────────────────────────────────
 // PALETTE (exact from tailwind.config.js)
@@ -622,10 +623,10 @@ const DashboardPage = () => {
       try {
         // 🌟 1st Priority: Fetch BOTH dashboard data and roadmap data simultaneously
         const [dashRes, roadRes] = await Promise.all([
-          fetch('http://localhost:5000/api/dashboard/data', {
+          fetch(`${API}/api/chat`, {
             headers: { 'Content-Type': 'application/json', 'x-auth-token': token }
           }),
-          fetch('http://localhost:5000/api/roadmap/generate', {
+          fetch(`${API}/api/chat`, {
             headers: { 'Content-Type': 'application/json', 'x-auth-token': token }
           })
         ]);
