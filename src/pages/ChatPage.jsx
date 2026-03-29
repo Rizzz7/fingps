@@ -144,31 +144,17 @@ export default function ChatPage() {
     }
 
     try {
-  const response = await fetch(`${API}/api/chat`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-auth-token": token,
-    },
-    body: JSON.stringify({ message: textToSend }),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Something went wrong");
-  }
-
-  // ✅ Use AI reply
-  console.log(data.reply);
-  // or setState(data.reply)
-
-} catch (error) {
-  console.error("Chat error:", error.message);
-}
+      const response = await fetch(`${API}/api/chat`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-auth-token": token,
+        },
+        body: JSON.stringify({ message: textToSend }),
+      });
 
       const data = await response.json();
-      
+
       if (response.ok) {
         setMessages(prev => [...prev, { role: 'arth', text: data.reply }]);
       } else {
