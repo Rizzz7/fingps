@@ -1,13 +1,57 @@
-import { useState, useEffect } from 'react'
+// src/pages/Roadmap.jsx
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const NAV_ITEMS = [
   { icon: '✦', label: 'AI Insights', id: 'insights' },
-  { icon: '📡', label: 'GPS Status', id: 'gps', active: true },
-  { icon: '🌐', label: 'Market Orbit', id: 'market' },
+  { icon: '🔀', label: 'What-If', id: 'whatif' },
   { icon: '💬', label: 'Talk to ARTH', id: 'arth' },
 ]
+
+// ── PAGE REGISTRY ──
+const PAGES = [
+  { label: 'Dashboard',    path: '/dashboard' },
+  { label: 'Roadmap',      path: '/roadmap' },
+  { label: 'Quiz',         path: '/quiz' },
+  { label: 'Results',      path: '/results' },
+  { label: 'What-If',      path: '/whatif' },
+  { label: 'Talk to ARTH', path: '/chat' },
+  { label: 'Analysis',     path: '/analysis' },
+]
+
+// ── PAGE JUMP DROPDOWN ──
+function PageJump({ navigate }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+  useEffect(() => {
+    const h = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
+    document.addEventListener('mousedown', h)
+    return () => document.removeEventListener('mousedown', h)
+  }, [])
+  return (
+    <div ref={ref} style={{ position: 'relative' }}>
+      <motion.button whileHover={{ borderColor: '#95d7e4', color: '#95d7e4' }} whileTap={{ scale: 0.96 }}
+        onClick={() => setOpen(o => !o)}
+        style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '7px 13px', borderRadius: '9px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(79,111,241,0.18)', color: 'rgba(255,255,255,0.5)', fontSize: '12px', fontWeight: 600, fontFamily: 'Space Grotesk, sans-serif', cursor: 'pointer', transition: 'all 0.2s' }}
+      >⌘ Jump <span style={{ fontSize: '10px', opacity: 0.5 }}>{open ? '▲' : '▼'}</span></motion.button>
+      <AnimatePresence>
+        {open && (
+          <motion.div initial={{ opacity: 0, y: -8, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -6, scale: 0.97 }} transition={{ duration: 0.16 }}
+            style={{ position: 'absolute', top: '42px', right: 0, width: '180px', background: '#0e0b0e', border: '1px solid rgba(79,111,241,0.18)', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 20px 48px rgba(0,0,0,0.7)', zIndex: 999 }}
+          >
+            {PAGES.map((p, i) => (
+              <motion.div key={p.path} whileHover={{ background: 'rgba(149,215,228,0.08)', color: '#95d7e4' }}
+                onClick={() => { navigate(p.path); setOpen(false) }}
+                style={{ padding: '10px 16px', fontSize: '12px', fontWeight: 600, color: 'rgba(255,255,255,0.5)', fontFamily: 'Space Grotesk, sans-serif', cursor: 'pointer', borderBottom: i < PAGES.length - 1 ? '1px solid rgba(79,111,241,0.12)' : 'none', transition: 'all 0.15s' }}
+              >{p.label}</motion.div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
 
 const nodeStyle = (status) => {
   if (status === 'completed') return { bg: '#4ade80', border: 'none', glow: '0 0 18px rgba(74,222,128,0.7)', textColor: '#022c1a' }
@@ -21,10 +65,9 @@ const RoadmapPage = () => {
   const [activeNav, setActiveNav] = useState('gps')
   const [activeNode, setActiveNode] = useState(null) 
   
-  // ── NEW DYNAMIC STATE ──
   const [milestones, setMilestones] = useState([])
   const [progress, setProgress] = useState(0)
-  const [currentMission, setCurrentMission] = useState('Loading...')
+  const [currentMission, setCurrentMission] = useState('Analyzing Profile...')
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -41,16 +84,18 @@ const RoadmapPage = () => {
         })
         const data = await response.json()
 
-        if (response.ok) {
+        if (response.ok && data.milestones) {
+          console.log("ALIVE DATA FROM AI:", data);
           setMilestones(data.milestones)
           setProgress(data.progress)
           
-          // Find the active mission to display in the header and set as default open node
           const active = data.milestones.find(m => m.status === 'current')
           if (active) {
             setCurrentMission(active.label)
             setActiveNode(active.id)
           }
+        } else {
+            console.error("Failed to load roadmap data:", data)
         }
       } catch (error) {
         console.error("Error fetching roadmap:", error)
@@ -62,22 +107,37 @@ const RoadmapPage = () => {
     fetchRoadmap()
   }, [navigate])
 
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('finGpsResults')
+    navigate('/login')
+  }
+
   const handleNodeClick = (node) => setActiveNode(prev => prev === node.id ? null : node.id)
   
-  const handleCTA = (milestone) => {
-    if (milestone.status === 'current') navigate('/analysis')
-    else if (milestone.id === 7) setActiveNav('arth')
+const handleCTA = (milestone) => {
+    // If it's the current mission or the dream mission, send them to ARTH with the prompt
+    if (milestone.status === 'current' || milestone.status === 'dream') {
+      navigate('/chat', { state: { autoPrompt: milestone.actionPrompt } });
+    } 
+    // If they click a completed milestone, let them see their general analysis
+    else if (milestone.status === 'completed') {
+      navigate('/analysis');
+    }
   }
 
   const handleNavClick = (id) => {
     setActiveNav(id)
-    if (id === 'arth') navigate('/chat') // Prepare for Option B!
+    if (id === 'arth') navigate('/chat')
+    if (id === 'whatif') navigate('/whatif')
+    if (id === 'insights') navigate('/analysis')
   }
 
   if (isLoading) {
     return (
-      <div style={{ minHeight: '100vh', background: '#03050f', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontFamily: 'Be Vietnam Pro, sans-serif' }}>
-        <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }} style={{ width: '40px', height: '40px', border: '3px solid rgba(149,215,228,0.2)', borderTopColor: '#95d7e4', borderRadius: '50%' }} />
+      <div style={{ minHeight: '100vh', background: '#03050f', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#fff', fontFamily: 'Be Vietnam Pro, sans-serif' }}>
+        <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }} style={{ width: '40px', height: '40px', border: '3px solid rgba(149,215,228,0.2)', borderTopColor: '#95d7e4', borderRadius: '50%', marginBottom: '20px' }} />
+        <p style={{ color: '#95d7e4', fontSize: '14px', letterSpacing: '1px' }}>AI is mapping your path...</p>
       </div>
     )
   }
@@ -85,14 +145,14 @@ const RoadmapPage = () => {
   return (
     <div style={{ minHeight: '100vh', background: '#03050f', fontFamily: 'Be Vietnam Pro, sans-serif', color: '#fff', overflowX: 'hidden', position: 'relative' }}>
       
-      {/* ── DOT GRID & GLOWS ── */}
+      {/* DOT GRID & GLOWS */}
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0, backgroundImage: 'radial-gradient(rgba(149,215,228,0.06) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
         <div style={{ position: 'absolute', top: '-10%', left: '-5%', width: '600px', height: '600px', background: 'radial-gradient(ellipse, rgba(79,79,241,0.18) 0%, transparent 65%)', filter: 'blur(80px)' }} />
         <div style={{ position: 'absolute', bottom: '-10%', right: '-5%', width: '500px', height: '500px', background: 'radial-gradient(ellipse, rgba(0,123,227,0.15) 0%, transparent 65%)', filter: 'blur(80px)' }} />
       </div>
 
-      {/* ── TOP NAVBAR ── */}
+      {/* TOP NAVBAR */}
       <nav style={{ position: 'fixed', top: 0, width: '100%', zIndex: 50, background: 'rgba(3,5,15,0.85)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', borderBottom: '1px solid rgba(79,111,241,0.12)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 32px', height: '64px' }}>
         <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'linear-gradient(135deg, #007be3, #4f4ff1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -102,18 +162,23 @@ const RoadmapPage = () => {
         </Link>
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
-          <Link to="/results" style={{ fontSize: '14px', fontWeight: 500, color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>Dashboard</Link>
+          <Link to="/dashboard" style={{ fontSize: '14px', fontWeight: 500, color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>Dashboard</Link>
           <a href="#" style={{ fontSize: '14px', fontWeight: 700, color: '#95d7e4', textDecoration: 'none', borderBottom: '2px solid #95d7e4', paddingBottom: '2px' }}>Roadmap</a>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <PageJump navigate={navigate} />
+          <motion.button whileHover={{ borderColor: '#f87171', color: '#f87171' }} whileTap={{ scale: 0.96 }}
+            onClick={handleLogout}
+            style={{ padding: '7px 14px', borderRadius: '9px', background: 'rgba(248,113,113,0.06)', border: '1px solid rgba(248,113,113,0.2)', color: 'rgba(248,113,113,0.7)', fontSize: '12px', fontWeight: 700, fontFamily: 'Space Grotesk, sans-serif', cursor: 'pointer', transition: 'all 0.2s' }}
+          >Log Out</motion.button>
           <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: 'linear-gradient(135deg, #4f4ff1, #007be3)', border: '2px solid rgba(149,215,228,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 700, color: '#fff' }}>P</div>
         </div>
       </nav>
 
       <main style={{ position: 'relative', zIndex: 1, paddingTop: '96px', paddingBottom: '120px', minHeight: '100vh' }}>
         
-        {/* ── PROGRESS HEADER ── */}
+        {/* PROGRESS HEADER */}
         <motion.header style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 32px', marginBottom: '48px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '24px', flexWrap: 'wrap' }} initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
@@ -140,7 +205,7 @@ const RoadmapPage = () => {
           </div>
         </motion.header>
 
-        {/* ── WINDING PATH MAP ── */}
+        {/* WINDING PATH MAP */}
         <div style={{ position: 'relative', width: '100%', height: '620px', maxWidth: '1400px', margin: '0 auto', padding: '0 16px' }}>
           <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }} viewBox="0 0 1400 600" preserveAspectRatio="xMidYMid meet" fill="none">
             <defs>
@@ -154,7 +219,7 @@ const RoadmapPage = () => {
             <motion.path d="M50 300C250 300 350 100 550 100C750 100 650 500 850 500C1050 500 1150 300 1350 300" stroke="url(#pathGradient)" strokeWidth="3" strokeDasharray="12 8" filter="url(#glow)" initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 1 }} transition={{ duration: 2.5, ease: 'easeInOut', delay: 0.3 }} />
           </svg>
 
-          {/* ── SECTOR LABELS ── */}
+          {/* SECTOR LABELS */}
           <motion.div style={{ position: 'absolute', top: '8px', left: '16px', opacity: 0.5 }} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 0.5, x: 0 }} transition={{ duration: 0.6, delay: 0.5 }}>
             <span style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#4ade80', display: 'block' }}>Sector 01</span>
             <span style={{ fontFamily: 'Be Vietnam Pro, sans-serif', fontSize: '20px', fontWeight: 700, color: '#fff' }}>Safety Net</span>
@@ -168,7 +233,7 @@ const RoadmapPage = () => {
             <span style={{ fontFamily: 'Be Vietnam Pro, sans-serif', fontSize: '20px', fontWeight: 700, color: '#fff' }}>Dream Fund</span>
           </motion.div>
 
-          {/* ── MILESTONE NODES ── */}
+          {/* MILESTONE NODES */}
           {milestones.map((node, i) => {
             const ns = nodeStyle(node.status)
             const isActive = activeNode === node.id
@@ -180,7 +245,7 @@ const RoadmapPage = () => {
             return (
               <motion.div key={node.id} style={{ position: 'absolute', left: `${(node.x / 1400) * 100}%`, top: `${(node.y / 600) * 100}%`, transform: 'translate(-50%, -50%)', zIndex: isCurrent ? 20 : 10, cursor: node.status === 'locked' ? 'not-allowed' : 'pointer' }} initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, delay: 0.5 + i * 0.15, ease: 'backOut' }}>
                 
-                {/* ── POPUP CARD ── */}
+                {/* POPUP CARD */}
                 <AnimatePresence>
                   {isActive && (
                     <motion.div style={{ position: 'absolute', bottom: `${nodeSize / 2 + 20}px`, left: '50%', transform: 'translateX(-50%)', width: '300px', background: 'rgba(12,20,58,0.92)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(149,215,228,0.2)', borderTop: '1px solid rgba(149,215,228,0.35)', borderRadius: '20px', padding: '24px', boxShadow: '0 24px 64px rgba(0,0,0,0.6), 0 0 40px rgba(79,111,241,0.15)', zIndex: 30, pointerEvents: 'all' }} initial={{ opacity: 0, y: 12, scale: 0.93 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 8, scale: 0.95 }} transition={{ duration: 0.25, ease: 'easeOut' }}>
@@ -230,7 +295,7 @@ const RoadmapPage = () => {
         </div>
       </main>
 
-      {/* ── BOTTOM NAV ── */}
+      {/* BOTTOM NAV */}
       <motion.div style={{ position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(8,12,32,0.85)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderRadius: '99px', padding: '6px 8px', minWidth: '420px', border: '1px solid rgba(79,111,241,0.2)', boxShadow: '0 24px 48px rgba(0,0,0,0.5), 0 0 30px rgba(79,79,241,0.1)', gap: '4px' }} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.8 }}>
         {NAV_ITEMS.map((item) => {
           const isActive = activeNav === item.id

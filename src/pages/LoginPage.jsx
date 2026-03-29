@@ -44,6 +44,7 @@ const LoginPage = () => {
   }
 
   // ── THE BACKEND CONNECTION (LOGIN) ──
+  // ── THE BACKEND CONNECTION (LOGIN) ──
   const handleLogin = async (e) => {
     e.preventDefault()
     setErrorMessage('')
@@ -59,9 +60,15 @@ const LoginPage = () => {
 
       if (response.ok) {
         console.log('Login Success!')
-        localStorage.setItem('token', data.token) // Save secure JWT token
-        localStorage.setItem('user', JSON.stringify(data.user)) // Save user data
-        navigate('/quiz') // Send them to the main app!
+        localStorage.setItem('token', data.token) 
+        localStorage.setItem('user', JSON.stringify(data.user)) 
+        
+        // ── PREMIUM UX: SMART ROUTING ──
+        if (data.user.hasCompletedQuiz) {
+          navigate('/dashboard') // Skip quiz, go straight to dashboard
+        } else {
+          navigate('/quiz') // First-timers go to the quiz
+        }
       } else {
         setErrorMessage(data.message || 'Invalid credentials')
       }

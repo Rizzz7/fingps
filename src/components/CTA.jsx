@@ -103,7 +103,7 @@ const CTA = () => {
               transition={{ duration: 0.6, delay: 0.5 }}
               viewport={{ once: true }}
             >
-              Join 20,000+ Indians who have taken the 2-minute quiz and got their personalised financial roadmap. Free forever.
+              Join thousands of Indians who have taken the 2-minute quiz and got their personalised financial roadmap. Free forever.
             </motion.p>
 
             {/* ── BUTTONS ──

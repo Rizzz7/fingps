@@ -11,6 +11,9 @@ import AnalysisPage from './pages/AnalysisPage'
 import ResultsPage from './pages/ResultsPage'
 import RoadmapPage from './pages/Roadmap'
 import ChatPage from './pages/ChatPage'
+import DashboardPage from './pages/DashboardPage'
+import WhatIfEngine from './pages/WhatIfEngine'
+
 
 function App() {
   return (
@@ -25,6 +28,12 @@ function App() {
         <Route path="/results" element={<ResultsPage />} />
         <Route path="/roadmap" element={<RoadmapPage />} />
         <Route path="/chat" element={<ChatPage />} />
+       
+
+       <Route path="/dashboard" element={<DashboardPage />} />
+       <Route path="/whatif" element={<WhatIfEngine />} />
+       
+       
       </Routes>
     </BrowserRouter>
   )

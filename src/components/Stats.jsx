@@ -50,15 +50,15 @@ const useCountUp = (target, shouldStart, duration = 1800) => {
   return count
 }
 
-// ── STAT DATA ──
+// ── STAT DATA (UPDATED FOR IMPACT) ──
 // rawValue: the actual number to count up to
 // prefix/suffix: characters to add around the number (₹, +, %)
 // label + desc: text below the number
 const stats = [
-  { rawValue: 20, suffix: 'K+', label: 'Active Users', desc: 'Growing every day' },
-  { prefix: '₹', rawValue: 500, suffix: 'Cr+', label: 'Tracked Assets', desc: 'Across all accounts' },
-  { rawValue: 99.9, suffix: '%', label: 'Uptime', desc: 'Always available', isDecimal: true },
-  { rawValue: 100, suffix: '%', label: 'Free to Start', desc: 'No credit card needed' },
+  { rawValue: 30, suffix: '%', label: 'Optimised Savings', desc: 'Found via AI spending analysis' },
+  { rawValue: 3, suffix: '', label: 'Strategic Buckets', desc: 'Simplifying complex wealth building' },
+  { rawValue: 24, suffix: '/7', label: 'AI Mentorship', desc: 'Real-time guidance, zero jargon' },
+  { rawValue: 100, suffix: '%', label: 'Financial Clarity', desc: 'Every single rupee, mapped' },
 ]
 
 // ── SINGLE STAT ITEM ──
@@ -73,15 +73,10 @@ const StatItem = ({ stat, index }) => {
 
   // Start counting when isInView becomes true
   const count = useCountUp(
-    stat.isDecimal ? 999 : stat.rawValue,
+    stat.rawValue,
     isInView,
     1600 + index * 100  // slight delay per stat for stagger feel
   )
-
-  // Format the displayed number
-  const displayValue = stat.isDecimal
-    ? '99.9'           // hardcode decimal — count-up for decimals looks odd
-    : count
 
   return (
     // motion.div for the fade-in entrance
@@ -108,7 +103,7 @@ const StatItem = ({ stat, index }) => {
           WebkitTextFillColor: 'transparent',
         }}
       >
-        {stat.prefix || ''}{displayValue}{stat.suffix}
+        {stat.prefix || ''}{count}{stat.suffix}
       </p>
       <p className="text-base font-semibold mb-1">{stat.label}</p>
       <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>{stat.desc}</p>

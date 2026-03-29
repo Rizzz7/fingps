@@ -235,7 +235,7 @@ const Hero = () => {
           style={{ fontFamily: 'Inter, sans-serif', fontSize: 'clamp(16px, 2vw, 20px)', color: 'rgba(255,255,255,0.55)', lineHeight: '1.6', maxWidth: '560px' }}
           initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: 'easeOut', delay: 0.3 }}>
-          India's first AI financial mentor. Understand where you are. Build where you're going. Every rupee, mapped.
+          Built for Indian salaries, Indian goals, and Indian dreams.Your money has a destination. Let's build the route.
         </motion.p>
 
         {/* CTA Buttons */}
@@ -243,10 +243,10 @@ const Hero = () => {
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: 'easeOut', delay: 0.45 }}>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
-            <Link to="/quiz" className="btn-primary text-base px-8 py-3.5" style={{ textDecoration: 'none' }}>
-              Take the Quiz 
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            <Link to="/signup" className="btn-primary text-base px-8 py-3.5" style={{ textDecoration: 'none' }}>
+             Get Started 
             </Link>
+            
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
             <a href="#how-it-works" className="btn-secondary text-base px-8 py-3.5">

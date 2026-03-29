@@ -1,5 +1,48 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
+
+const PAGES = [
+  { label: 'Dashboard',    path: '/dashboard' },
+  { label: 'Roadmap',      path: '/roadmap' },
+  { label: 'Quiz',         path: '/quiz' },
+  { label: 'Results',      path: '/results' },
+  { label: 'What-If',      path: '/whatif' },
+  { label: 'Talk to ARTH', path: '/chat' },
+  { label: 'Analysis',     path: '/analysis' },
+]
+
+function PageJump({ navigate }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+  useEffect(() => {
+    const h = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
+    document.addEventListener('mousedown', h)
+    return () => document.removeEventListener('mousedown', h)
+  }, [])
+  return (
+    <div ref={ref} style={{ position: 'relative' }}>
+      <motion.button whileHover={{ borderColor: '#95d7e4', color: '#95d7e4' }} whileTap={{ scale: 0.96 }}
+        onClick={() => setOpen(o => !o)}
+        style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '7px 13px', borderRadius: '9px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', color: 'rgba(255,255,255,0.5)', fontSize: '12px', fontWeight: 600, fontFamily: 'Space Grotesk, sans-serif', cursor: 'pointer', transition: 'all 0.2s' }}
+      >⌘ Jump <span style={{ fontSize: '10px', opacity: 0.5 }}>{open ? '▲' : '▼'}</span></motion.button>
+      <AnimatePresence>
+        {open && (
+          <motion.div initial={{ opacity: 0, y: -8, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -6, scale: 0.97 }} transition={{ duration: 0.16 }}
+            style={{ position: 'absolute', top: '42px', right: 0, width: '180px', background: 'rgba(14,11,14,0.97)', backdropFilter: 'blur(18px)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 20px 48px rgba(0,0,0,0.7)', zIndex: 999 }}
+          >
+            {PAGES.map((p, i) => (
+              <motion.div key={p.path} whileHover={{ background: 'rgba(149,215,228,0.08)', color: '#95d7e4' }}
+                onClick={() => { navigate(p.path); setOpen(false) }}
+                style={{ padding: '10px 16px', fontSize: '12px', fontWeight: 600, color: 'rgba(255,255,255,0.5)', fontFamily: 'Space Grotesk, sans-serif', cursor: 'pointer', borderBottom: i < PAGES.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none', transition: 'all 0.15s' }}
+              >{p.label}</motion.div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
 
 const STARS = Array.from({ length: 70 }, (_, i) => ({
   id: i,
@@ -21,6 +64,12 @@ const AnalysisPage = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const answers = location.state?.answers || []
+
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('finGpsResults')
+    navigate('/login')
+  }
 
   const [progress, setProgress] = useState(0)
   const [msgIndex, setMsgIndex] = useState(0)
@@ -63,6 +112,16 @@ const AnalysisPage = () => {
       className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-6"
       style={{ background: '#03050f', fontFamily: 'Be Vietnam Pro, sans-serif' }}
     >
+      {/* ── TOP-RIGHT NAV CLUSTER ── */}
+      <div style={{ position: 'fixed', top: '16px', right: '20px', zIndex: 50, display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <PageJump navigate={navigate} />
+        <motion.button whileHover={{ borderColor: '#f87171', color: '#f87171' }} whileTap={{ scale: 0.96 }}
+          onClick={handleLogout}
+          style={{ padding: '7px 14px', borderRadius: '9px', background: 'rgba(248,113,113,0.06)', border: '1px solid rgba(248,113,113,0.2)', color: 'rgba(248,113,113,0.7)', fontSize: '12px', fontWeight: 700, fontFamily: 'Space Grotesk, sans-serif', cursor: 'pointer', transition: 'all 0.2s' }}
+        >Log Out</motion.button>
+        <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #4f4ff1, #007be3)', border: '2px solid rgba(149,215,228,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 700, color: '#fff' }}>P</div>
+      </div>
+
       {/* ── BACKGROUND — stronger glow than other screens ── */}
       <div className="absolute inset-0 pointer-events-none">
         {STARS.map(s => (
