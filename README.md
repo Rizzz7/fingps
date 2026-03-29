@@ -20,6 +20,7 @@ Built for the **ET AI National Level Hackathon**.
 - **Financial DNA Score** — A personalised 0–100 score calculated from your answers
 - **Interactive Dashboard** — Live score ring, ARTH Actions, weakness detection, and wealth simulation
 - **ARTH AI Advisor** — Powered by Gemini API, knows your score and gives India-specific advice
+- **WHATif Engine** - A complete multiverse timeline where you can simulate multiple outcomes based on current actions.
 - **Financial Roadmap** — A visual GPS-style milestone map across 3 buckets: Safety Net → Wealth Engine → Dream Fund
 - **Simulate Feature** — See Elite, Good, and Slow wealth paths projected 20 years ahead with compound interest math
 - **Premium Dark UI** — Glassmorphism, Framer Motion animations, twinkling starfield, cinematic fog
