@@ -220,7 +220,7 @@ const QuizPage = () => {
     }
 
     try {
-      const response = await fetch(`${API}/api/chat`, {
+      const response = await fetch(`${API}/api/quiz/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

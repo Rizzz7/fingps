@@ -79,7 +79,7 @@ const RoadmapPage = () => {
       }
 
       try {
-        const response = await fetch(`${API}/api/chat`, {
+        const response = await fetch(`${API}/api/roadmap`, {
           headers: { 'x-auth-token': token }
         })
         const data = await response.json()

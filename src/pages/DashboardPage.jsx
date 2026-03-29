@@ -623,10 +623,10 @@ const DashboardPage = () => {
       try {
         // 🌟 1st Priority: Fetch BOTH dashboard data and roadmap data simultaneously
         const [dashRes, roadRes] = await Promise.all([
-          fetch(`${API}/api/chat`, {
+          fetch(`${API}/api/dashboard`, {
             headers: { 'Content-Type': 'application/json', 'x-auth-token': token }
           }),
-          fetch(`${API}/api/chat`, {
+          fetch(`${API}/api/roadmap`, {
             headers: { 'Content-Type': 'application/json', 'x-auth-token': token }
           })
         ]);
